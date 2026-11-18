@@ -7,7 +7,7 @@ import android.content.Context
 class LocalPrefsStore(context: Context) {
     private val prefs = context.getSharedPreferences("swarmwatch_local_prefs", Context.MODE_PRIVATE)
 
-    fun getHostPort(): String = prefs.getString("host_port", "127.0.0.1:8080") ?: "127.0.0.1:8080"
+    fun getHostPort(): String = prefs.getString("host_port", "10.0.2.2:8080") ?: "10.0.2.2:8080"
     fun setHostPort(v: String) = prefs.edit().putString("host_port", v.trim()).apply()
 
     fun getToken(): String = prefs.getString("lan_token", "") ?: ""
