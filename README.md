@@ -1,4 +1,4 @@
-# Survivable Multi-UAV Autonomy Under Uncertainty
+# Swarm-Watch: Survivable Multi-UAV Autonomy Under Uncertainty
 
 This repository presents a multi-tier survivable fixed-wing multi-UAV autonomy suite targeting contested, GNSS-denied, communication-impaired, and actuator-degraded environments (prepared for ICAAV-2026, ADE-DRDO & AeSI). The original M.Tech MATLAB Live Script (`project4.mlx`), its extracted plain-text `.m` source (`project4.m`), and the faithful baseline Python port (`project4_as_is.py`) are preserved verbatim in [`legacy_as_is/`](legacy_as_is/) alongside all seven baseline figures. The upgraded system resolves all twelve structural, estimation, guidance, control, and autonomy flaws identified in the baseline by unifying the entire flight-software core, cyber-EW security layer, HTTP/WebSocket transport, and native 60 FPS OpenGL 3D tactical viewer in zero-dependency **C++20 + OpenMP**, paired with a pure **HTML5/CSS3/Vanilla JS** web console and a minimal **Kotlin + Jetpack Compose** Android tactical alert companion app (*SwarmWatch*).
 
