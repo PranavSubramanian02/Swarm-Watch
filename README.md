@@ -1,6 +1,6 @@
 # Swarm-Watch: Survivable Multi-UAV Autonomy Under Uncertainty
 
-This repository presents a multi-tier survivable fixed-wing multi-UAV autonomy suite targeting contested, GNSS-denied, communication-impaired, and actuator-degraded environments (prepared for ICAAV-2026, ADE-DRDO & AeSI). The original M.Tech MATLAB Live Script (`project4.mlx`), its extracted plain-text `.m` source (`project4.m`), and the faithful baseline Python port (`project4_as_is.py`) are preserved verbatim in [`legacy_as_is/`](legacy_as_is/) alongside all seven baseline figures. The upgraded system resolves all twelve structural, estimation, guidance, control, and autonomy flaws identified in the baseline by unifying the entire flight-software core, cyber-EW security layer, HTTP/WebSocket transport, and native 60 FPS OpenGL 3D tactical viewer in zero-dependency **C++20 + OpenMP**, paired with a pure **HTML5/CSS3/Vanilla JS** web console and a minimal **Kotlin + Jetpack Compose** Android tactical alert companion app (*SwarmWatch*).
+This repository presents a multi-tier survivable fixed-wing multi-UAV autonomy suite targeting contested, GNSS-denied, communication-impaired, and actuator-degraded environments. The original M.Tech MATLAB Live Script (`project4.mlx`), its extracted plain-text `.m` source (`project4.m`), and the faithful baseline Python port (`project4_as_is.py`) are preserved verbatim in [`legacy_as_is/`](legacy_as_is/) alongside all seven baseline figures. The upgraded system resolves all twelve structural, estimation, guidance, control, and autonomy flaws identified in the baseline by unifying the entire flight-software core, cyber-EW security layer, HTTP/WebSocket transport, and native 60 FPS OpenGL 3D tactical viewer in zero-dependency **C++20 + OpenMP**, paired with a pure **HTML5/CSS3/Vanilla JS** web console and a minimal **Kotlin + Jetpack Compose** Android tactical alert companion app (*SwarmWatch*).
 
 ## System Architecture
 
@@ -43,7 +43,7 @@ The upgraded C++20 architecture replaces these sequentially coupled scripts with
 3. **Strictly Observable $\mathcal{L}_1$ Adaptive Fault-Tolerant Control**: Following Hovakimyan, Cao, Xargay, & Gregory (*IEEE Control Systems Magazine*, 2011, `DOI: 10.1109/MCS.2011.941961`) and Lee, Bernstein et al. (2022, `arXiv:2210.13621`), executes a state predictor with Pseudo-Control Hedging, projection-bounded adaptation for unknown roll/thrust effectiveness ($\hat{\boldsymbol{\Lambda}}$) and matched icing/trim disturbances ($\hat{\boldsymbol{\sigma}}$), bandwidth-limited low-pass filtering $C(s)$, CUSUM residual fault detection, and Total Energy Control System (TECS) speed–altitude coupling—accepting zero ground-truth arguments at compile time.
 4. **Time-Based Rotating Master–Slave, Multi-Hop RF, Bellman MDP, and Event-Driven CBBA**: Rotates Master authority across scheduled TDMA epochs ($T_{\text{rot}} = 35\,\text{s}$) to balance RF battery load and provide Moving Target Defense against jamming (Zhou et al. 2025, `arXiv:2506.07392`), paired with instant health-weighted preemptive failover protected by monotonic epoch-lease verification, 2-hop RF relay forwarding with Fiedler algebraic connectivity $\lambda_2(\mathbf{L})$ tracking, discounted Bellman Value Iteration over 36 belief-health states exercising all four modes dynamically, Event-Driven CBBA task reallocation (Sao & Sujit 2025, `DOI: 10.1109/icuas65942.2025.11007849`), Park–Deyst–How $L_1$ path and wind-compensated loiter-orbit guidance, and 3D fixed-wing CBF-QP + TCAS flight-level deconfliction.
 
-## Quantitative ICAAV-2026 Ablation Benchmarks (100-Run OpenMP Monte Carlo)
+## Quantitative Ablation Benchmarks (100-Run OpenMP Monte Carlo)
 
 Evaluated across `N = 100` randomized 160-second contested 5-UAV sorties per configuration (featuring a 60-second global GNSS blackout, distance-dependent Gilbert–Elliott burst packet dropouts, and 45% roll / 40% thrust actuator loss on UAV-2):
 
@@ -65,7 +65,7 @@ Key verified engineering gains:
 - [`backend/`](backend/README.md) — Zero-dependency C++20 flight software (`core/`), cyber-EW and API guards (`security/`), HTTP/WebSocket server (`transport/`), and CTest verification (`tests/`).
 - [`frontend/`](frontend/README.md) — Native 60 FPS C++20 OpenGL/GLFW 3D tactical viewer (`opengl_viewer/`) and WCAG AA accessible HTML5/CSS3/Vanilla JS tactical web console (`web_console/`).
 - [`app/`](app/README.md) — Minimal 3-tab Kotlin + Jetpack Compose Android companion app (*SwarmWatch*), internally partitioned into `backend/`, `security/`, and `frontend/` with dual-trigger push notifications, Ideal-vs-Actual trajectory deviation canvas, Offline Demo Mode, Privacy Policy, and 1-tap local data deletion.
-- [`tools/export_icaav_figures.py`](tools/export_icaav_figures.py) — Offline-only Matplotlib script generating all 12 300 DPI publication PNGs into [`output_figures/`](output_figures/).
+- [`tools/export_figures.py`](tools/export_figures.py) — Offline-only Matplotlib script generating all 12 300 DPI publication PNGs into [`output_figures/`](output_figures/).
 - [`research_papers/`](research_papers/LITERATURE_BENCHMARKS.md) — 12 verified open-access peer-reviewed PDFs and full bibliographic mapping across 19 CrossRef/DataCite-verified references.
 - [`legacy_as_is/`](legacy_as_is/) — Archived original MATLAB Live Script (`project4.mlx`), extracted `project4.m`, baseline `project4_as_is.py`, and 7 original figures.
 
@@ -88,7 +88,7 @@ adb reverse tcp:8080 tcp:8080
 
 # 4. Regenerate all 12 publication-grade 300 DPI figures offline
 source ~/.venvs/eng-ds/bin/activate
-python3 tools/export_icaav_figures.py
+python3 tools/export_figures.py
 ```
 
 ## Verified References

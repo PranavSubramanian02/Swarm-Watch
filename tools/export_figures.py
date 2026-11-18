@@ -1,4 +1,4 @@
-# Offline 300 DPI ICAAV-2026 figure exporter reading C++20 swarm_server CSV and OpenMP ablation JSON
+# Offline 300 DPI publication figure exporter reading C++20 swarm_server CSV and OpenMP ablation JSON
 
 import json
 import os
@@ -213,7 +213,7 @@ def export_figures(repo_root: str = None, dpi: int = 300) -> str:
     ax2.set_title("100-Run OpenMP Ablation: Mission Completion")
     ax2.grid(True, axis="y", ls=":", alpha=0.5)
     fig.tight_layout()
-    fig.savefig(os.path.join(out_dir, "fig11_icaav_ablation_rmse_completion.png"), dpi=dpi)
+    fig.savefig(os.path.join(out_dir, "fig11_ablation_rmse_completion.png"), dpi=dpi)
     plt.close(fig)
 
     # Fig 12: 100-Run OpenMP Ablation — SOC Spread & CBBA Bandwidth Savings
@@ -234,7 +234,7 @@ def export_figures(repo_root: str = None, dpi: int = 300) -> str:
     ax2.set_ylim(0, 105)
     ax2.grid(True, axis="y", ls=":", alpha=0.5)
     fig.tight_layout()
-    fig.savefig(os.path.join(out_dir, "fig12_icaav_ablation_soc_cbba.png"), dpi=dpi)
+    fig.savefig(os.path.join(out_dir, "fig12_ablation_soc_cbba.png"), dpi=dpi)
     plt.close(fig)
 
     print("Ablation summary:")
@@ -245,4 +245,4 @@ def export_figures(repo_root: str = None, dpi: int = 300) -> str:
 
 if __name__ == "__main__":
     out = export_figures()
-    print(f"Exported 12 300 DPI ICAAV-2026 figures to {out}")
+    print(f"Exported 12 300 DPI publication figures to {out}")

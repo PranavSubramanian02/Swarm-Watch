@@ -26,7 +26,7 @@ fun LegalDialog(
                     color = SwarmColors.TextSecondary, fontSize = 12.sp
                 )
                 Text(
-                    "Terms & Disclaimer: Developed by Pranav Subramanian as academic M.Tech / ICAAV-2026 research software. Experimental simulation monitor only—not flight-certified avionics.",
+                    "Terms & Disclaimer: Developed by Pranav Subramanian as academic M.Tech aerospace research software. Experimental simulation monitor only—not flight-certified avionics.",
                     color = SwarmColors.TextSecondary, fontSize = 12.sp
                 )
                 Text(
