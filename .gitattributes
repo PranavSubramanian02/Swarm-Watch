@@ -1,1 +1,10 @@
 *.m linguist-language=MATLAB
+*.cpp linguist-language=C++
+*.hpp linguist-language=C++
+*.kt linguist-language=Kotlin
+*.kts linguist-language=Kotlin
+*.js linguist-language=JavaScript
+*.html linguist-language=HTML
+*.css linguist-language=CSS
+*.py linguist-language=Python
+CMakeLists.txt linguist-language=CMake

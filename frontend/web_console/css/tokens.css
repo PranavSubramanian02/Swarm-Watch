@@ -1,0 +1,29 @@
+/* WCAG AA (>= 4.5:1) dark aerospace design tokens (system fonts only, zero third-party font tracking) */
+
+:root {
+    --bg-cockpit: #070b13;
+    --bg-panel: #0d1422;
+    --bg-elevated: #141f34;
+    --border-subtle: #1e2d47;
+    --border-active: #38bdf8;
+
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+
+    --accent-cyan: #38bdf8;
+    --accent-blue: #2563eb;
+    --accent-gold: #facc15;
+    --status-nominal: #34d399;
+    --status-caution: #fbbf24;
+    --status-critical: #f87171;
+
+    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, monospace;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --space-sm: 8px;
+    --space-md: 14px;
+    --space-lg: 20px;
+}

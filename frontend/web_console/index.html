@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survivable Multi-UAV Swarm Autonomy — C++20 Tactical Console</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23070b13'/><polygon points='16,4 28,24 16,19 4,24' fill='%23facc15'/></svg>">
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+    <header class="topbar" role="banner">
+        <div class="brand">
+            <span class="brand-title">Survivable Multi-UAV Swarm Autonomy</span>
+            <span class="brand-sub">Pure C++20 Backend · 15-State Quaternion ESKF · L1 Adaptive FTC · Rotating Master-Slave</span>
+        </div>
+        <nav class="nav-tabs" aria-label="Primary Console Views">
+            <button class="tab-btn active" data-tab="tactical" aria-selected="true">Live Tactical Arena</button>
+            <button class="tab-btn" data-tab="diagnostics" aria-selected="false">GNC &amp; Ablation</button>
+            <button class="tab-btn" data-tab="legal" aria-selected="false">Privacy &amp; Legal</button>
+        </nav>
+        <div id="master-pill" class="status-pill" role="status" aria-live="polite">MASTER: UAV-1 · E01</div>
+    </header>
+
+    <div class="shell">
+        <aside class="sidebar" aria-label="Swarm Scenarios and Fault Injection Controls">
+            <div class="panel">
+                <div class="panel-title">Guided Stress Scenarios</div>
+                <div class="btn-stack">
+                    <button id="btn-sc-blackout" class="btn btn-caution">Trigger GNSS Blackout (DR+NHC)</button>
+                    <button id="btn-sc-spoof" class="btn btn-danger">Inject Adversarial GNSS Spoof</button>
+                    <button id="btn-sc-fault" class="btn btn-danger">Inject 45% Roll/Thrust LoE + Icing</button>
+                    <button id="btn-sc-disc" class="btn btn-caution">Disconnect UAV-3 Comms Link</button>
+                    <button id="btn-sc-kill" class="btn btn-danger">Trigger Active Master Attrition</button>
+                    <button id="btn-sc-rot" class="btn btn-gold">Force Master-Slave Rotation</button>
+                    <button id="btn-sc-reset" class="btn btn-outline">Reset Nominal Sortie</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Formation &amp; View Controls</div>
+                <div class="btn-stack">
+                    <label for="sel-formation" class="kpi-label">Formation Geometry</label>
+                    <select id="sel-formation" aria-label="Swarm Formation Geometry">
+                        <option value="0" selected>V-Wedge (GDOP Staggered)</option>
+                        <option value="1">Echelon Right</option>
+                        <option value="2">Diamond</option>
+                        <option value="3">Wide ISR Spread</option>
+                    </select>
+                    <label for="sel-view-mode" class="kpi-label">Viewport Projection</label>
+                    <select id="sel-view-mode" aria-label="Viewport Projection Mode">
+                        <option value="3d" selected>3D Perspective Orbit (Drag)</option>
+                        <option value="2d">2D Top-Down Tactical Radar</option>
+                    </select>
+                    <button id="btn-pause" class="btn btn-outline">Pause / Resume</button>
+                    <a class="btn btn-outline" href="/api/v1/telemetry.csv" download="swarm_telemetry.csv" style="text-align:center; text-decoration:none;">Export Flight Log CSV</a>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">LAN Security Token (Optional)</div>
+                <input id="inp-token" type="text" placeholder="Leave blank if open LAN" aria-label="Optional LAN Auth Token">
+            </div>
+        </aside>
+
+        <main class="content" role="main">
+            <!-- View 1: Live Tactical Arena + Dual Alerts + Fleet Table -->
+            <section id="view-tactical" class="view-section active" aria-label="Live Tactical Airspace">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <span class="kpi-label">Active Master &amp; Epoch</span>
+                        <span id="kpi-master" class="kpi-value">UAV-1 · E01</span>
+                        <span id="kpi-epoch-rem" class="kpi-sub">Next rotation: -- s</span>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-label">Swarm Mesh (Fiedler λ2)</span>
+                        <span id="kpi-fiedler" class="kpi-value">--</span>
+                        <span id="kpi-latency" class="kpi-sub">Avg RF latency: -- ms</span>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-label">Max Trajectory XTE</span>
+                        <span id="kpi-xte" class="kpi-value">-- m</span>
+                        <span id="kpi-dr-cnt" class="kpi-sub">DR Active: 0 / 5 UAVs</span>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-label">ISR Orbits Completed</span>
+                        <span id="kpi-tasks" class="kpi-value">0 / 8</span>
+                        <span id="kpi-simtime" class="kpi-sub">Mission Time: 0.0 s</span>
+                    </div>
+                </div>
+
+                <div class="arena-grid">
+                    <div class="panel">
+                        <div class="panel-title">Interactive Fixed-Wing Airspace · Ideal (Dashed) vs Actual (Solid) + 15s Drift Cone</div>
+                        <div id="viewport-host" class="viewport-box" aria-label="3D and 2D Multi-UAV Tactical Airspace Canvas"></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-title">Real-Time Tactical Alert Feed (Synced to Android SwarmWatch)</div>
+                        <div id="alert-feed" class="alert-list" role="log" aria-live="polite"></div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title">Fleet Health, Role, Navigation &amp; Trajectory Deviation Roster</div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>UAV</th>
+                                <th>Role</th>
+                                <th>Swarm Link</th>
+                                <th>Nav Mode</th>
+                                <th>XTE [m]</th>
+                                <th>3σ [m]</th>
+                                <th>L1 η̂</th>
+                                <th>SOC</th>
+                                <th>MDP Mode</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fleet-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- View 2: GNC Diagnostics & OpenMP 60-Run ICAAV Ablation -->
+            <section id="view-diagnostics" class="view-section" aria-label="GNC Diagnostics and Ablation">
+                <div class="chart-grid-2">
+                    <div class="panel">
+                        <div class="panel-title">Live Cross-Track Deviation (XTE) &amp; 3σ Uncertainty</div>
+                        <div id="plot-xte-sigma" class="plot-box"></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-title">Fleet Battery SOC Balance &amp; L1 Effectiveness (η̂)</div>
+                        <div id="plot-soc-l1" class="plot-box"></div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div class="panel-title" style="margin:0;">C++20 OpenMP Monte Carlo ICAAV-2026 Ablation Matrix</div>
+                        <button id="btn-run-ablation" class="btn">Run OpenMP Ablation (4 × 60 Runs)</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Configuration</th>
+                                <th>RMSE [m]</th>
+                                <th>NEES OK</th>
+                                <th>Tasks Done</th>
+                                <th>Collisions</th>
+                                <th>SOC Spread</th>
+                                <th>CBBA Saved</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ablation-tbody">
+                            <tr><td colspan="7" style="color:var(--text-muted);">Click "Run OpenMP Ablation" to execute live C++20 Monte Carlo comparison.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- View 3: Privacy Policy, Simulation Disclaimer, Licenses & Local Data Deletion -->
+            <section id="view-legal" class="view-section" aria-label="Privacy Policy, Terms, and Data Controls">
+                <div class="panel">
+                    <div class="panel-title">Privacy Policy, Terms of Use &amp; Compliance Notice</div>
+                    <div class="legal-list">
+                        <p><strong>Local-Only Data Policy:</strong> This console and the companion Android app operate strictly on your local loopback/LAN. Zero cloud telemetry, zero tracking cookies, zero analytics SDKs, and zero personal user accounts are collected or transmitted.</p>
+                        <p><strong>Experimental Simulation Disclaimer:</strong> Developed by Pranav Subramanian as academic M.Tech / ICAAV-2026 aerospace research software. Not flight-certified avionics; do not use for safety-critical physical aircraft command.</p>
+                        <p><strong>Accessibility &amp; Open-Source Assets:</strong> System sans/monospace fonts, WCAG AA (&ge; 4.5:1) contrast tokens, keyboard focus indicators, and ARIA landmarks. Plotly.js is MIT-licensed.</p>
+                        <div class="btn-row" style="margin-top:8px;">
+                            <button id="btn-delete-local" class="btn btn-danger">Delete All Local Browser Data</button>
+                            <span id="delete-status" style="align-self:center; color:var(--status-nominal); font-family:var(--font-mono); font-size:12px;"></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/api_client.js"></script>
+    <script src="js/scene_3d.js"></script>
+    <script src="js/plots.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
